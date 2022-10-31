@@ -21,8 +21,8 @@ const Flight = {
   },
 };
 
-events.on("Manager", handleMa);
-function handleMa() {
+events.on("Manager", handleManager);
+function handleManager() {
   console.log("Manager: we’re greatly thankful for the amazing flight");
 }
 
@@ -32,7 +32,7 @@ Flight.Flight.Details.flightID = ID;
 Flight.Flight.Details.pilot = Pilot;
 Flight.Flight.Details.Destination = Destination;
 
-events.emit("Manager", Flight);
+events.emit("new-flight", Flight);
 
 setTimeout(() => {
     console.log(`Manager: we're greatly thankful for the amazing flight ${Pilot} `);
