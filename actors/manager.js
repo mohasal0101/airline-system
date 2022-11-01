@@ -1,40 +1,35 @@
-"use strict";
+ 'use strict';
 
-const { faker } = require("@faker-js/faker");
-const events = require("../events/event-global");
+ const {faker} = require('@faker-js/faker');
+ const events = require('../events/events');
+ require('./pilot');
+    require('./system');
 
-// Generating data
 
-const Pilot = faker.name.firstName('male');
-const ID = faker.random.numeric();
-const Destination = faker.address.city();
+ setInterval(()=>{
+    const randomDestinations = faker.address.city();
+    const randomPilots = faker.name.firstName();
+    const randomID = faker.random.numeric();
+     const Flight = {
+         Flight : {
+          event: '',
+             time: new Date(),
+             Details: {
+             airLine: 'London Heathrow Airport',
+             destination: randomDestinations,
+             pilot: randomPilots,
+             flightID: randomID
+             }
+         }
+     }
 
-const Flight = {
-  event: {
-    time: new Date(),
-    Details: {
-      airLine: "Air India",
-      Destination: Destination,
-      pilot: Pilot,
-      flightID: ID,
-    },
-  },
-};
+     console.log(`Manager: flight with ID ${randomID} is ready to take-off`);
+     events.emit('new-flight', Flight);
+ }
+    , 5000);
 
-events.on("Manager", handleManager);
-function handleManager() {
-  console.log("Manager: we’re greatly thankful for the amazing flight");
-}
-
-console.log(`Manager: new flight with ${Flight.event.Details.pilot} is ready`);
-
-Flight.Flight.Details.flightID = ID;
-Flight.Flight.Details.pilot = Pilot;
-Flight.Flight.Details.Destination = Destination;
-
-events.emit("new-flight", Flight);
-
-setTimeout(() => {
-    console.log(`Manager: we're greatly thankful for the amazing flight ${Pilot} `);
-}, 1000);
-
+    events.on('arrived', (payload) => {
+        console.log(`Manager: we're thankful for your service, ${payload.Flight.Details.pilot}`);
+        console.log(payload);
+    }
+    );
