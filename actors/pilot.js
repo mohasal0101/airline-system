@@ -1,36 +1,28 @@
-'use strict';
+ 'use strict';
 
-const { faker } = require ('@faker-js/faker');
-const events = require('../events/event-global');
+ const events = require('../events/events');
+ require('./system');
+ require('./manager');
 
-const Pilots = faker.name();
-const ID = faker.random.numeric();
-const Destination = faker.address.country();
 
-const Flight = {
-    Flight: {
-        event: '',
-        time: new Date(),
-        Details: {
-            airLine: 'Royal Jordanian Airlines',
-            Destination: Destination,
-            pilot: Pilots,
-            flightID: ID,
-        },
-    },
+ events.on('new-flight', handleNewFlight);
+
+ function handleNewFlight(payload){
+     console.log(`Manager: New flight with ID ${payload.Flight.Details.flightID} has been scheduled`);
+     console.log(payload);
+
+     setTimeout(async function() {
+         payload.Flight.event = 'took-off';
+         await events.emit('took-off', payload);
+     }, 4000);
+
+     setTimeout(async function() {
+         payload.Flight.event = 'Arrived';
+         await events.emit('Arrived', payload);
+     }, 7000);
+    
+     setTimeout(async function() {
+         await events.emit('flight-arrived', payload.pilot);
+     }, 9000);
     
  }
-
-console.log(`Manager: new flight with ${Flight.Flight.Details.pilot} is ready`);
-
-console.emit('flight', Flight);
-
-setTimeout(() => {
-    console.log(`Manager: we're greatly thankful for the amazing flight ${Pilot} `);
-}
-, 1000);
-
-events.emit('took-off');
-
-
-
