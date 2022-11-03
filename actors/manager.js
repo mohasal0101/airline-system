@@ -1,35 +1,41 @@
- 'use strict';
+'use strict';
 
- const {faker} = require('@faker-js/faker');
- const events = require('../events/events');
- require('./pilot');
-    require('./system');
+const { faker } = require('@faker-js/faker');
 
+const randomPilots = faker.name.firstName();
+const randomID = faker.random.numeric();
+const randomDestinations  = faker.address.country();
 
- setInterval(()=>{
-    const randomDestinations = faker.address.city();
-    const randomPilots = faker.name.firstName();
-    const randomID = faker.random.numeric();
-     const Flight = {
-         Flight : {
-          event: '',
-             time: new Date(),
-             Details: {
-             airLine: 'London Heathrow Airport',
-             destination: randomDestinations,
-             pilot: randomPilots,
-             flightID: randomID
-             }
-         }
-     }
-
-     console.log(`Manager: flight with ID ${randomID} is ready to take-off`);
-     events.emit('new-flight', Flight);
- }
-    , 5000);
-
-    events.on('arrived', (payload) => {
-        console.log(`Manager: we're thankful for your service, ${payload.Flight.Details.pilot}`);
-        console.log(payload);
+const Flight = {
+    Flight : {
+     event: '',
+        time: new Date(),
+        Details: {
+        airLine: 'Jordanian Airlines',
+        destination: randomDestinations,
+        pilot: randomPilots,
+        flightID: randomID
+        }
     }
-    );
+}
+
+const io = require('socket.io-client');
+const host = `http://localhost:${process.env.PORT}/`;
+const connection = io.connect(host);
+connection.on('Manager', handleMa);
+function handleMa(payload){
+     console.log(`Manager: we’re greatly thankful for the amazing flight, ${payload}`);
+}
+setInterval(()=>{
+
+    console.log(`Manager: new flight with ID ${randomID} have been scheduled`);
+    Flight.Flight.Details.flightID = randomID;
+    Flight.Flight.Details.pilot = randomPilots;
+    Flight.Flight.Details.destination = randomDestinations;
+    connection.emit('new-flight', Flight);
+    setTimeout(async function() {
+        console.log(`Manager: we’re greatly thankful for the amazing flight, ${randomPilots}`);
+
+    }, 9999);
+
+ }, 10000);
